@@ -3,6 +3,7 @@ package hu.ait.android.aittime;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,6 +15,8 @@ import java.util.Date;
 
 
 public class MainActivity extends AppCompatActivity {
+
+    public static final String TAG_MAIN = "TAG_MAIN";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
                         getString(R.string.time_head)+
                                 new Date(System.currentTimeMillis()).toString();
 
+                Log.d(TAG_MAIN, "time value is: "+time);
+
                 /*Toast.makeText(MainActivity.this,
                         time,
                         Toast.LENGTH_SHORT).show();*/
@@ -43,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
                 Snackbar.make(layoutContent,
                         time,
                         Snackbar.LENGTH_LONG).show();
+
+                Log.d(TAG_MAIN, "Snackbar was shown");
             }
         });
 
