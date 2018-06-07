@@ -1,5 +1,7 @@
 package hu.ait.android.highlowgame;
 
+import android.content.Intent;
+import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -12,17 +14,26 @@ import java.util.Random;
 
 public class GameActivity extends AppCompatActivity {
 
+    public static final String KEY_GEN = "KEY_GEN";
+    public static final String KEY_MSG = "KEY_MSG";
     private int generated = 0;
+    private TextView tvStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        generateNewNumber();
+        tvStatus = findViewById(R.id.tvStatus);
+
+        if (savedInstanceState != null) {
+            generated = savedInstanceState.getInt(KEY_GEN);
+            tvStatus.setText(savedInstanceState.getString(KEY_MSG));
+        } else {
+            generateNewNumber();
+        }
 
         final EditText etGuess = findViewById(R.id.etGuess);
-        final TextView tvStatus = findViewById(R.id.tvStatus);
         Button btnGuess = findViewById(R.id.btnGuess);
         btnGuess.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -34,6 +45,11 @@ public class GameActivity extends AppCompatActivity {
 
                         if (num == generated) {
                             tvStatus.setText("Congratulations!");
+
+                            Intent intentResult = new Intent();
+                            intentResult.setClass(GameActivity.this, ResultActivity.class);
+                            startActivity(intentResult);
+
                         } else if (num < generated) {
                             tvStatus.setText("Your number is smaller");
                         } else if (num > generated) {
@@ -51,8 +67,16 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt(KEY_GEN, generated);
+        outState.putString(KEY_MSG, tvStatus.getText().toString());
+
+        super.onSaveInstanceState(outState);
+    }
+
     private void generateNewNumber() {
         Random rand = new Random(System.currentTimeMillis());
-        generated = rand.nextInt(100);
+        generated = rand.nextInt(3);
     }
 }
