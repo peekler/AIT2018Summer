@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">AutoCompleteDemo</string>
+
+    <string-array name="countires">
+        <item>America</item>
+        <item>Australia</item>
+        <item>Austria</item>
+        <item>Hungary</item>
+    </string-array>
+</resources>
