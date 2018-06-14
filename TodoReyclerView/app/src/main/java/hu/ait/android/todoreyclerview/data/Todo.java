@@ -1,14 +1,35 @@
 package hu.ait.android.todoreyclerview.data;
 
+
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
+
+@Entity
 public class Todo {
+
+    @PrimaryKey(autoGenerate = true)
+    private long todoId;
+
+    @ColumnInfo(name = "todo_date")
     private String todoDate;
+    @ColumnInfo(name = "todo_title")
     private String todoTitle;
+    @ColumnInfo(name = "done")
     private boolean done;
 
     public Todo(String todoDate, String todoTitle, boolean done) {
         this.todoDate = todoDate;
         this.todoTitle = todoTitle;
         this.done = done;
+    }
+
+    public long getTodoId() {
+        return todoId;
+    }
+
+    public void setTodoId(long todoId) {
+        this.todoId = todoId;
     }
 
     public String getTodoDate() {

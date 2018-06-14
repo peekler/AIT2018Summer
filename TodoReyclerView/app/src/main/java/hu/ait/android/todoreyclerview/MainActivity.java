@@ -2,24 +2,24 @@ package hu.ait.android.todoreyclerview;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 
-import hu.ait.android.todoreyclerview.adapter.TodoReyclerAdapter;
+import java.util.List;
+
+import hu.ait.android.todoreyclerview.adapter.TodoRecyclerAdapter;
+import hu.ait.android.todoreyclerview.data.AppDatabase;
 import hu.ait.android.todoreyclerview.data.Todo;
 import hu.ait.android.todoreyclerview.touch.TodoItemTouchHelperCallback;
 
 public class MainActivity extends AppCompatActivity
         implements NewTodoDialog.TodoHandler {
 
-    private TodoReyclerAdapter adapter;
+    private TodoRecyclerAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,14 +41,32 @@ public class MainActivity extends AppCompatActivity
         recyclerViewTodo.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewTodo.setHasFixedSize(true);
 
-        adapter = new TodoReyclerAdapter();
-        recyclerViewTodo.setAdapter(adapter);
+        initRecyclerView(recyclerViewTodo);
+    }
 
+    private void initRecyclerView(final RecyclerView recyclerViewTodo) {
+        new Thread() {
+            @Override
+            public void run() {
+                final List<Todo> todos =
+                        AppDatabase.getAppDatabase(
+                                MainActivity.this).todoDao().getAllTodo();
 
-        ItemTouchHelper.Callback callback =
-                new TodoItemTouchHelperCallback(adapter);
-        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
-        touchHelper.attachToRecyclerView(recyclerViewTodo);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        adapter = new TodoRecyclerAdapter(
+                                MainActivity.this, todos);
+                        recyclerViewTodo.setAdapter(adapter);
+
+                        ItemTouchHelper.Callback callback =
+                                new TodoItemTouchHelperCallback(adapter);
+                        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+                        touchHelper.attachToRecyclerView(recyclerViewTodo);
+                    }
+                });
+            }
+        }.start();
     }
 
     public void showNewTodoDialog() {
@@ -57,7 +75,22 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void todoCreated(Todo todo) {
-        adapter.addTodo(todo);
+    public void todoCreated(final Todo todo) {
+        new Thread() {
+            @Override
+            public void run() {
+                long id = AppDatabase.getAppDatabase(MainActivity.this).todoDao().
+                        insertTodo(todo);
+
+                todo.setTodoId(id);
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        adapter.addTodo(todo);
+                    }
+                });
+            }
+        }.start();
     }
 }

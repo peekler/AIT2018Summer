@@ -1,5 +1,6 @@
 package hu.ait.android.todoreyclerview.adapter;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,29 +10,24 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import hu.ait.android.todoreyclerview.R;
+import hu.ait.android.todoreyclerview.data.AppDatabase;
 import hu.ait.android.todoreyclerview.data.Todo;
 import hu.ait.android.todoreyclerview.touch.TodoTouchHelperAdapter;
 
-public class TodoReyclerAdapter
-        extends RecyclerView.Adapter<TodoReyclerAdapter.ViewHolder>
+public class TodoRecyclerAdapter
+        extends RecyclerView.Adapter<TodoRecyclerAdapter.ViewHolder>
         implements TodoTouchHelperAdapter {
 
     private List<Todo> todoList;
+    private Context context;
 
-    public TodoReyclerAdapter() {
-        todoList = new ArrayList<>();
-
-        /*for (int i = 0; i < 20; i++) {
-            todoList.add(new Todo(
-                    new Date(System.currentTimeMillis()).toString(),
-                    "Todo "+i, false));
-        }*/
+    public TodoRecyclerAdapter(Context context, List<Todo> todoList) {
+        this.context = context;
+        this.todoList = todoList;
     }
 
     @NonNull
@@ -61,6 +57,15 @@ public class TodoReyclerAdapter
     }
 
     public void deleteTodoBasedOnPosition(int position) {
+        final Todo todoToDelete = todoList.get(position);
+        new Thread() {
+            @Override
+            public void run() {
+                AppDatabase.getAppDatabase(context).todoDao().deleteTodo(
+                        todoToDelete);
+            }
+        }.start();
+
         todoList.remove(position);
         //notifyDataSetChanged();
         notifyItemRemoved(position);
