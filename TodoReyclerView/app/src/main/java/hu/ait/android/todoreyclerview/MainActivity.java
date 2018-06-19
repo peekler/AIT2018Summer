@@ -1,6 +1,8 @@
 package hu.ait.android.todoreyclerview;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,6 +23,7 @@ public class MainActivity extends AppCompatActivity
         implements NewAndEditTodoDialog.TodoHandler {
 
     public static final String KEY_TODO_TO_EDIT = "KEY_TODO_TO_EDIT";
+    public static final String KEY_WAS_STARTED = "KEY_WAS_STARTED";
     private TodoRecyclerAdapter adapter;
 
     @Override
@@ -31,6 +34,18 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        initFloatingActionWithTutorial();
+
+        RecyclerView recyclerViewTodo = findViewById(R.id.recyclerTodo);
+        recyclerViewTodo.setLayoutManager(new LinearLayoutManager(this));
+        recyclerViewTodo.setHasFixedSize(true);
+
+        initRecyclerView(recyclerViewTodo);
+
+        saveFirstTimeStart();
+    }
+
+    private void initFloatingActionWithTutorial() {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -39,17 +54,24 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        new MaterialTapTargetPrompt.Builder(MainActivity.this)
-                .setTarget(findViewById(R.id.fab))
-                .setPrimaryText("New todo")
-                .setSecondaryText("Tap the envelop to create new todo")
-                .show();
+        if (!wasAlreadyStarted()) {
+            new MaterialTapTargetPrompt.Builder(MainActivity.this)
+                    .setTarget(findViewById(R.id.fab))
+                    .setPrimaryText("New todo")
+                    .setSecondaryText("Tap the envelop to create new todo")
+                    .show();
+        }
+    }
 
-        RecyclerView recyclerViewTodo = findViewById(R.id.recyclerTodo);
-        recyclerViewTodo.setLayoutManager(new LinearLayoutManager(this));
-        recyclerViewTodo.setHasFixedSize(true);
+    private void saveFirstTimeStart() {
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+        editor.putBoolean(KEY_WAS_STARTED, true);
+        editor.commit(); // DO NOT FORGET
+    }
 
-        initRecyclerView(recyclerViewTodo);
+    private boolean wasAlreadyStarted() {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        return sp.getBoolean(KEY_WAS_STARTED, false);
     }
 
     private void initRecyclerView(final RecyclerView recyclerViewTodo) {

@@ -37,7 +37,6 @@ public class TodoRecyclerAdapter
         View todoRowView =
                 LayoutInflater.from(parent.getContext()).inflate(
                         R.layout.todo_row, parent, false);
-
         return new ViewHolder(todoRowView);
     }
 
@@ -49,6 +48,36 @@ public class TodoRecyclerAdapter
         holder.cbDone.setText(todo.getTodoTitle());
         holder.cbDone.setChecked(todo.isDone());
 
+        initEventHandler(holder, todo);
+    }
+
+    private void initEventHandler(@NonNull ViewHolder holder, Todo todo) {
+        initCheckBox(holder, todo);
+        initDelete(holder);
+        initEdit(holder, todo);
+    }
+
+    private void initEdit(@NonNull ViewHolder holder, final Todo todo) {
+        holder.btnEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MainActivity)context).showEditTodoDialog(
+                        todo
+                );
+            }
+        });
+    }
+
+    private void initDelete(@NonNull final ViewHolder holder) {
+        holder.btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteTodoBasedOnPosition(holder.getAdapterPosition());
+            }
+        });
+    }
+
+    private void initCheckBox(@NonNull final ViewHolder holder, final Todo todo) {
         holder.cbDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -59,22 +88,6 @@ public class TodoRecyclerAdapter
                         AppDatabase.getAppDatabase(context).todoDao().updateTodo(todo);
                     }
                 }.start();
-            }
-        });
-
-        holder.btnDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                deleteTodoBasedOnPosition(holder.getAdapterPosition());
-            }
-        });
-
-        holder.btnEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((MainActivity)context).showEditTodoDialog(
-                        todo
-                );
             }
         });
     }

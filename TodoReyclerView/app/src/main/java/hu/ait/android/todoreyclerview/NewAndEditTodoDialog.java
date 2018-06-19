@@ -46,16 +46,7 @@ public class NewAndEditTodoDialog extends DialogFragment {
 
         builder.setTitle("New Todo");
 
-        etTodo = new EditText(getActivity());
-        builder.setView(etTodo);
-
-        if (getArguments() != null && getArguments().containsKey(MainActivity.KEY_TODO_TO_EDIT)) {
-            Todo todo = (Todo) getArguments().getSerializable(
-                    MainActivity.KEY_TODO_TO_EDIT);
-            etTodo.setText(todo.getTodoTitle());
-
-            builder.setTitle("Edit todo");
-        }
+        initDialogContent(builder);
 
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
@@ -64,6 +55,18 @@ public class NewAndEditTodoDialog extends DialogFragment {
             }
         });
         return builder.create();
+    }
+
+    private void initDialogContent(AlertDialog.Builder builder) {
+        etTodo = new EditText(getActivity());
+        builder.setView(etTodo);
+        if (getArguments() != null && getArguments().containsKey(MainActivity.KEY_TODO_TO_EDIT)) {
+            Todo todo = (Todo) getArguments().getSerializable(
+                    MainActivity.KEY_TODO_TO_EDIT);
+            etTodo.setText(todo.getTodoTitle());
+
+            builder.setTitle("Edit todo");
+        }
     }
 
 
@@ -80,17 +83,9 @@ public class NewAndEditTodoDialog extends DialogFragment {
                 public void onClick(View v) {
                     if (!TextUtils.isEmpty(etTodo.getText().toString())) {
                         if (getArguments() != null && getArguments().containsKey(MainActivity.KEY_TODO_TO_EDIT)) {
-                            Todo todoToEdit = (Todo) getArguments().getSerializable(
-                                    MainActivity.KEY_TODO_TO_EDIT);
-                            todoToEdit.setTodoTitle(etTodo.getText().toString());
-
-                            todoHandler.todoUpdated(todoToEdit);
+                            handleTodoEdit();
                         } else {
-                            todoHandler.todoCreated(new Todo(
-                                    new Date(System.currentTimeMillis()).toString(),
-                                    etTodo.getText().toString(),
-                                    false
-                            ));
+                            handleTodoCreate();
                         }
 
                         dialog.dismiss();
@@ -100,5 +95,21 @@ public class NewAndEditTodoDialog extends DialogFragment {
                 }
             });
         }
+    }
+
+    private void handleTodoCreate() {
+        todoHandler.todoCreated(new Todo(
+                new Date(System.currentTimeMillis()).toString(),
+                etTodo.getText().toString(),
+                false
+        ));
+    }
+
+    private void handleTodoEdit() {
+        Todo todoToEdit = (Todo) getArguments().getSerializable(
+                MainActivity.KEY_TODO_TO_EDIT);
+        todoToEdit.setTodoTitle(etTodo.getText().toString());
+
+        todoHandler.todoUpdated(todoToEdit);
     }
 }
