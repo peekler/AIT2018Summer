@@ -13,6 +13,7 @@ import android.widget.TextView;
 import java.util.Collections;
 import java.util.List;
 
+import hu.ait.android.todoreyclerview.MainActivity;
 import hu.ait.android.todoreyclerview.R;
 import hu.ait.android.todoreyclerview.data.AppDatabase;
 import hu.ait.android.todoreyclerview.data.Todo;
@@ -48,10 +49,32 @@ public class TodoRecyclerAdapter
         holder.cbDone.setText(todo.getTodoTitle());
         holder.cbDone.setChecked(todo.isDone());
 
+        holder.cbDone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                todo.setDone(holder.cbDone.isChecked());
+                new Thread() {
+                    @Override
+                    public void run() {
+                        AppDatabase.getAppDatabase(context).todoDao().updateTodo(todo);
+                    }
+                }.start();
+            }
+        });
+
         holder.btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 deleteTodoBasedOnPosition(holder.getAdapterPosition());
+            }
+        });
+
+        holder.btnEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MainActivity)context).showEditTodoDialog(
+                        todo
+                );
             }
         });
     }
@@ -103,10 +126,29 @@ public class TodoRecyclerAdapter
         notifyItemMoved(fromPosition, toPosition);
     }
 
+    public void updateTodo(Todo todo) {
+        int pos = findTodoIndexByTodoId(todo.getTodoId());
+        if (pos != -1) {
+            todoList.set(pos, todo);
+            notifyItemChanged(pos);
+        }
+    }
+
+    private int findTodoIndexByTodoId(long todoId) {
+        for (int i = 0; i < todoList.size(); i++) {
+            if (todoList.get(i).getTodoId() == todoId) {
+                return i;
+            }
+        }
+
+        return  -1;
+    }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private TextView tvTodoDate;
         private CheckBox cbDone;
         private Button btnDelete;
+        private Button btnEdit;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -114,6 +156,7 @@ public class TodoRecyclerAdapter
             tvTodoDate = itemView.findViewById(R.id.tvDate);
             cbDone = itemView.findViewById(R.id.cbDone);
             btnDelete = itemView.findViewById(R.id.btnDelete);
+            btnEdit = itemView.findViewById(R.id.btnEdit);
         }
     }
 }

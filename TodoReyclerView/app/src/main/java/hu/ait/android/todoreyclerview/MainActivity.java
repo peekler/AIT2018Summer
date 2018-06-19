@@ -15,10 +15,12 @@ import hu.ait.android.todoreyclerview.adapter.TodoRecyclerAdapter;
 import hu.ait.android.todoreyclerview.data.AppDatabase;
 import hu.ait.android.todoreyclerview.data.Todo;
 import hu.ait.android.todoreyclerview.touch.TodoItemTouchHelperCallback;
+import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt;
 
 public class MainActivity extends AppCompatActivity
-        implements NewTodoDialog.TodoHandler {
+        implements NewAndEditTodoDialog.TodoHandler {
 
+    public static final String KEY_TODO_TO_EDIT = "KEY_TODO_TO_EDIT";
     private TodoRecyclerAdapter adapter;
 
     @Override
@@ -36,6 +38,12 @@ public class MainActivity extends AppCompatActivity
                 showNewTodoDialog();
             }
         });
+
+        new MaterialTapTargetPrompt.Builder(MainActivity.this)
+                .setTarget(findViewById(R.id.fab))
+                .setPrimaryText("New todo")
+                .setSecondaryText("Tap the envelop to create new todo")
+                .show();
 
         RecyclerView recyclerViewTodo = findViewById(R.id.recyclerTodo);
         recyclerViewTodo.setLayoutManager(new LinearLayoutManager(this));
@@ -69,8 +77,20 @@ public class MainActivity extends AppCompatActivity
         }.start();
     }
 
+    public void showEditTodoDialog(Todo todoToEdit) {
+        NewAndEditTodoDialog editTodoDialog = new NewAndEditTodoDialog();
+
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(KEY_TODO_TO_EDIT, todoToEdit);
+        editTodoDialog.setArguments(bundle);
+
+        editTodoDialog.show(getSupportFragmentManager(),
+                "EDITTODODIALOG");
+    }
+
+
     public void showNewTodoDialog() {
-        new NewTodoDialog().show(getSupportFragmentManager(),
+        new NewAndEditTodoDialog().show(getSupportFragmentManager(),
                 "TAG_NEW_TODO");
     }
 
@@ -88,6 +108,24 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void run() {
                         adapter.addTodo(todo);
+                    }
+                });
+            }
+        }.start();
+    }
+
+    @Override
+    public void todoUpdated(final Todo todo) {
+        new Thread() {
+            @Override
+            public void run() {
+                AppDatabase.getAppDatabase(MainActivity.this).todoDao().
+                        updateTodo(todo);
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        adapter.updateTodo(todo);
                     }
                 });
             }
