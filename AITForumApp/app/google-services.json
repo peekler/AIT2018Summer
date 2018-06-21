@@ -1,0 +1,59 @@
+{
+  "project_info": {
+    "project_number": "169920852653",
+    "firebase_url": "https://aitforumapp-5194f.firebaseio.com",
+    "project_id": "aitforumapp-5194f",
+    "storage_bucket": "aitforumapp-5194f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:169920852653:android:709d02bab23ab839",
+        "android_client_info": {
+          "package_name": "hu.ait.android.aitforumapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "169920852653-10klqd0lop5a0erb9i2j6onm29071cfd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "hu.ait.android.aitforumapp",
+            "certificate_hash": "679d077dd087334a5834d3d30791147420aace41"
+          }
+        },
+        {
+          "client_id": "169920852653-795ps46u97jn7qln2b5ldl1jbriqdcmk.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "169920852653-795ps46u97jn7qln2b5ldl1jbriqdcmk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAEZ119cKd8IpQ9xP2hST7VyczNl5i64qU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "169920852653-795ps46u97jn7qln2b5ldl1jbriqdcmk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
