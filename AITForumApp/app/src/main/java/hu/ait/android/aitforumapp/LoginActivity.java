@@ -1,10 +1,12 @@
 package hu.ait.android.aitforumapp;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -79,6 +81,45 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+
+    @OnClick(R.id.btnLogin)
+    void loginClick() {
+        if (!isFormValid()) {
+            return;
+        }
+
+        showProgressDialog();
+
+
+        firebaseAuth.signInWithEmailAndPassword(
+                etEmail.getText().toString(), etPassword.getText().toString()
+        ).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                hideProgressDialog();
+
+                if (task.isSuccessful()) {
+                    startActivity(new Intent(LoginActivity.this,
+                            MainActivity.class));
+                    finish();
+                } else {
+                    Toast.makeText(LoginActivity.this, "Wrong login: "+
+                            task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                hideProgressDialog();
+
+                Toast.makeText(LoginActivity.this,
+                        "Login failed: "+e.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
 
     private boolean isFormValid() {
         if (TextUtils.isEmpty(etEmail.getText().toString())) {
