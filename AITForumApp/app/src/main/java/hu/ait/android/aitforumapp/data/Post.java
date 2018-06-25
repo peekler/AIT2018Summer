@@ -6,14 +6,25 @@ public class Post {
     private String author;
     private String title;
     private String body;
+    private String imgUrl;
 
     public Post() {}
 
-    public Post(String uid, String author, String title, String body) {
+    public Post(String uid, String author, String title, String body,
+                String imgUrl) {
         this.uid = uid;
         this.author = author;
         this.title = title;
         this.body = body;
+        this.imgUrl = imgUrl;
+    }
+
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
     }
 
     public String getUid() {

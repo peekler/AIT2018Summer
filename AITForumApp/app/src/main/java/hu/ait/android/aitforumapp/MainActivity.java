@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                postsAdapter.removePostByKey(dataSnapshot.getKey());
             }
 
             @Override

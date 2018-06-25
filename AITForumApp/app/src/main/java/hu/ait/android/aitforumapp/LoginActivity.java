@@ -44,6 +44,10 @@ public class LoginActivity extends AppCompatActivity {
 
     @OnClick(R.id.btnRegister)
     void registerClick() {
+        //int a = 6/0;
+        //Log.d("TAG","value is: "+a);
+
+
         if (!isFormValid()) {
             return;
         }
