@@ -36,6 +36,9 @@ public class LocationMonitor implements LocationListener {
         locationManager.removeUpdates(this);
     }
 
+    public LocationManager getLocationManager() {
+        return locationManager;
+    }
 
     @Override
     public void onLocationChanged(Location location) {

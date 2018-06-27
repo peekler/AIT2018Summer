@@ -1,8 +1,12 @@
 package hu.ait.android.locationdemo;
 
 import android.Manifest;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.support.annotation.NonNull;
@@ -28,6 +32,10 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -182,8 +190,8 @@ public class MainActivity extends AppCompatActivity
                 new LatLng(44, 26),
                 new LatLng(48, 26),
                 new LatLng(48, 19));
-        Polygon polygon = mMap.addPolygon(polyRect);
-        polygon.setFillColor(Color.argb(50, 0, 255, 0));
+        //Polygon polygon = mMap.addPolygon(polyRect);
+        //polygon.setFillColor(Color.argb(50, 0, 255, 0));
 
 
         LatLng latLng = new LatLng(47, 19);
@@ -196,9 +204,7 @@ public class MainActivity extends AppCompatActivity
             public void onMapClick(LatLng latLng) {
                 MarkerOptions markerOptions = new MarkerOptions().
                         position(latLng).
-                        title("Marker").snippet("Long text of the marker")
-                        .icon(BitmapDescriptorFactory.fromResource(
-                                R.drawable.marker));
+                        title("Marker").snippet("Long text of the marker");
 
                 Marker marker = mMap.addMarker(markerOptions);
                 marker.setDraggable(true);
@@ -208,7 +214,45 @@ public class MainActivity extends AppCompatActivity
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                Toast.makeText(MainActivity.this, marker.getTitle(), Toast.LENGTH_SHORT).show();
+                Geocoder gc = new Geocoder(MainActivity.this,
+                        Locale.getDefault());
+
+                List<Address> addressList = null;
+                try {
+                    addressList = gc.getFromLocation(marker.getPosition().latitude,
+                            marker.getPosition().longitude, 5);
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(addressList.get(0).getAddressLine(0));
+
+
+                    Toast.makeText(MainActivity.this, sb.toString(), Toast.LENGTH_SHORT).show();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                Intent intentProxy = new Intent("ACTION_PROXY");
+                PendingIntent pendingProxy = PendingIntent.getBroadcast(
+                        MainActivity.this, 1001, intentProxy, 0
+                );
+                try {
+                    if (locationMonitor.getLocationManager() != null) {
+                        locationMonitor.getLocationManager().addProximityAlert(
+                                marker.getPosition().latitude,
+                                marker.getPosition().longitude,
+                                10000,
+                                60000,
+                                pendingProxy
+                        );
+                    }
+                }catch (SecurityException e) {
+                    e.printStackTrace();
+                    Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+
+
+
+                //Toast.makeText(MainActivity.this, marker.getTitle(), Toast.LENGTH_SHORT).show();
                 return true;
             }
         });
