@@ -3,11 +3,16 @@ package hu.aut.android.kotlinrecyclerviewdemo
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
+import android.view.View
 import hu.aut.android.kotlinrecyclerviewdemo.data.ShoppingItem
 import kotlinx.android.synthetic.main.activity_shopping.*
 import kotlinx.android.synthetic.main.content_shopping.*
 
 class ShoppingActivity : AppCompatActivity() {
+    companion object {
+        val KEY_ITEM_TO_EDIT = "KEY_ITEM_TO_EDIT"
+        val KEY_WAS_STARTED = "KEY_WAS_STARTED"
+    }
 
     private val adapter = ShoppingAdapter()
 
@@ -16,18 +21,14 @@ class ShoppingActivity : AppCompatActivity() {
         setContentView(R.layout.activity_shopping)
         setSupportActionBar(toolbar)
 
-        recyclerShopping.adapter = adapter
+        fab.setOnClickListener { showNewTodoDialog() }
 
-        btnAddItem.setOnClickListener{
-            if (etName.text.isNotBlank() &&
-                    etPrice.text.isNotBlank()) {
-                addItem(etName.text.toString(), etPrice.text.toString().toInt())
-            }
-        }
+        recyclerShopping.adapter = adapter
     }
 
-    private fun addItem(name: String, price: Int) {
-        adapter.addItem(ShoppingItem(name, price))
-        recyclerShopping.smoothScrollToPosition(adapter.itemCount)
+
+    private fun showNewTodoDialog() {
+        ShoppingItemDialog().show(supportFragmentManager,
+                "TAG_NEW_ITEM")
     }
 }
